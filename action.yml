@@ -1,0 +1,29 @@
+name: 'generate-changelog'
+description: 'GitHub Action for generating a change log. Based on Azure DevOps task.'
+author: 'Glenn Watson'
+inputs:
+  token:
+    description: >
+      Personal access token (PAT) used to fetch the repository. The PAT is configured
+      with the local git config, which enables your scripts to run authenticated git
+      commands. The post-job step removes the PAT.
+      We recommend using a service account with the least permissions necessary.
+      Also when generating a new PAT, select the least scopes necessary.
+      [Learn more about creating and using encrypted secrets](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets)
+    default: ${{ github.token }}
+    required: false
+  ref:
+    description: >
+      The branch, tag or SHA to checkout. When checking out the repository that
+      triggered a workflow, this defaults to the reference or SHA for that
+      event.  Otherwise, uses the default branch.
+    required: false
+outputs:
+  changelog:
+    description: 'Generated changelog'
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
+branding:
+  icon: 'edit'
+  color: 'gray-dark'
