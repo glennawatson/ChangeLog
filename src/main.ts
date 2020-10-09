@@ -12,7 +12,7 @@ async function run(): Promise<void> {
 
     core.setOutput('commitLog', commitLog.join('\n'));
   } catch (error) {
-    core.setFailed(error.message);
+    core.setFailed(`There is a weird error ${error.message}`);
   }
 }
 

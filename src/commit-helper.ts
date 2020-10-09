@@ -44,31 +44,7 @@ export class CommitHelper {
       }
 
       const commitLine = ` * ${commit.sha} ${message} ${author}`;
-      if (this.startsWithCaseInsensitive(author, '@dependabot-preview')) {
-        this.addItemToResponse(responses, 'Dependencies', commitLine);
-      } else if (this.startsWithCaseInsensitive(message, 'feature')) {
-        this.addItemToResponse(responses, 'Features', commitLine);
-      } else if (this.startsWithCaseInsensitive(message, 'feat')) {
-        this.addItemToResponse(responses, 'Features', commitLine);
-      } else if (this.startsWithCaseInsensitive(message, 'docs')) {
-        this.addItemToResponse(responses, 'Documentation', commitLine);
-      } else if (this.startsWithCaseInsensitive(message, 'style')) {
-        this.addItemToResponse(responses, 'Style Changes', commitLine);
-      } else if (this.startsWithCaseInsensitive(message, 'perf')) {
-        this.addItemToResponse(responses, 'Performance', commitLine);
-      } else if (this.startsWithCaseInsensitive(message, 'test')) {
-        this.addItemToResponse(responses, 'Test', commitLine);
-      } else if (this.startsWithCaseInsensitive(message, 'refactor')) {
-        this.addItemToResponse(responses, 'Refactoring', commitLine);
-      } else if (this.startsWithCaseInsensitive(message, 'housekeeping')) {
-        this.addItemToResponse(responses, 'Housekeeping', commitLine);
-      } else if (this.startsWithCaseInsensitive(message, 'fix')) {
-        this.addItemToResponse(responses, 'Fixes', commitLine);
-      } else if (this.startsWithCaseInsensitive(message, 'bug')) {
-        this.addItemToResponse(responses, 'Bug Fixes', commitLine);
-      } else {
-        this.addItemToResponse(responses, 'Other', commitLine);
-      }
+      this.mapItems(author, responses, commitLine, message);
     }
 
     const response: string[] = new Array<string>();
@@ -90,6 +66,34 @@ export class CommitHelper {
     }
 
     return response;
+  }
+
+  private mapItems(author: string, responses: Map<string, string[]>, commitLine: string, message: any) {
+    if (this.startsWithCaseInsensitive(author, '@dependabot-preview')) {
+      this.addItemToResponse(responses, 'Dependencies', commitLine);
+    } else if (this.startsWithCaseInsensitive(message, 'feature')) {
+      this.addItemToResponse(responses, 'Features', commitLine);
+    } else if (this.startsWithCaseInsensitive(message, 'feat')) {
+      this.addItemToResponse(responses, 'Features', commitLine);
+    } else if (this.startsWithCaseInsensitive(message, 'docs')) {
+      this.addItemToResponse(responses, 'Documentation', commitLine);
+    } else if (this.startsWithCaseInsensitive(message, 'style')) {
+      this.addItemToResponse(responses, 'Style Changes', commitLine);
+    } else if (this.startsWithCaseInsensitive(message, 'perf')) {
+      this.addItemToResponse(responses, 'Performance', commitLine);
+    } else if (this.startsWithCaseInsensitive(message, 'test')) {
+      this.addItemToResponse(responses, 'Test', commitLine);
+    } else if (this.startsWithCaseInsensitive(message, 'refactor')) {
+      this.addItemToResponse(responses, 'Refactoring', commitLine);
+    } else if (this.startsWithCaseInsensitive(message, 'housekeeping')) {
+      this.addItemToResponse(responses, 'Housekeeping', commitLine);
+    } else if (this.startsWithCaseInsensitive(message, 'fix')) {
+      this.addItemToResponse(responses, 'Fixes', commitLine);
+    } else if (this.startsWithCaseInsensitive(message, 'bug')) {
+      this.addItemToResponse(responses, 'Bug Fixes', commitLine);
+    } else {
+      this.addItemToResponse(responses, 'Other', commitLine);
+    }
   }
 
   private startsWithCaseInsensitive(source: string, target: string): boolean {
