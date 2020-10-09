@@ -1430,12 +1430,13 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const sourceSettings = inputHelper.getInputs();
+            core.debug(`${sourceSettings.commit} - ${sourceSettings.ref} - ${sourceSettings.repositoryName} - ${sourceSettings.repositoryOwner}`);
             const commitHelper = new releaseHelper.CommitHelper(sourceSettings);
             const commitLog = yield commitHelper.getCommitList();
             core.setOutput('commitLog', commitLog.join('\n'));
         }
         catch (error) {
-            core.setFailed(error.message);
+            core.setFailed(`There is a weird error ${error.message} ${error.stack}`);
         }
     });
 }
@@ -5477,42 +5478,7 @@ class CommitHelper {
                     author = commit.commit.author.name;
                 }
                 const commitLine = ` * ${commit.sha} ${message} ${author}`;
-                if (this.startsWithCaseInsensitive(author, '@dependabot-preview')) {
-                    this.addItemToResponse(responses, 'Dependencies', commitLine);
-                }
-                else if (this.startsWithCaseInsensitive(message, 'feature')) {
-                    this.addItemToResponse(responses, 'Features', commitLine);
-                }
-                else if (this.startsWithCaseInsensitive(message, 'feat')) {
-                    this.addItemToResponse(responses, 'Features', commitLine);
-                }
-                else if (this.startsWithCaseInsensitive(message, 'docs')) {
-                    this.addItemToResponse(responses, 'Documentation', commitLine);
-                }
-                else if (this.startsWithCaseInsensitive(message, 'style')) {
-                    this.addItemToResponse(responses, 'Style Changes', commitLine);
-                }
-                else if (this.startsWithCaseInsensitive(message, 'perf')) {
-                    this.addItemToResponse(responses, 'Performance', commitLine);
-                }
-                else if (this.startsWithCaseInsensitive(message, 'test')) {
-                    this.addItemToResponse(responses, 'Test', commitLine);
-                }
-                else if (this.startsWithCaseInsensitive(message, 'refactor')) {
-                    this.addItemToResponse(responses, 'Refactoring', commitLine);
-                }
-                else if (this.startsWithCaseInsensitive(message, 'housekeeping')) {
-                    this.addItemToResponse(responses, 'Housekeeping', commitLine);
-                }
-                else if (this.startsWithCaseInsensitive(message, 'fix')) {
-                    this.addItemToResponse(responses, 'Fixes', commitLine);
-                }
-                else if (this.startsWithCaseInsensitive(message, 'bug')) {
-                    this.addItemToResponse(responses, 'Bug Fixes', commitLine);
-                }
-                else {
-                    this.addItemToResponse(responses, 'Other', commitLine);
-                }
+                this.mapItems(author, responses, commitLine, message);
             }
             const response = new Array();
             responses = new Map([...responses].sort((a, b) => (a[0] > b[0] && 1) || (a[0] === b[0] ? 0 : -1)));
@@ -5525,6 +5491,44 @@ class CommitHelper {
             }
             return response;
         });
+    }
+    mapItems(author, responses, commitLine, message) {
+        if (this.startsWithCaseInsensitive(author, '@dependabot-preview')) {
+            this.addItemToResponse(responses, 'Dependencies', commitLine);
+        }
+        else if (this.startsWithCaseInsensitive(message, 'feature')) {
+            this.addItemToResponse(responses, 'Features', commitLine);
+        }
+        else if (this.startsWithCaseInsensitive(message, 'feat')) {
+            this.addItemToResponse(responses, 'Features', commitLine);
+        }
+        else if (this.startsWithCaseInsensitive(message, 'docs')) {
+            this.addItemToResponse(responses, 'Documentation', commitLine);
+        }
+        else if (this.startsWithCaseInsensitive(message, 'style')) {
+            this.addItemToResponse(responses, 'Style Changes', commitLine);
+        }
+        else if (this.startsWithCaseInsensitive(message, 'perf')) {
+            this.addItemToResponse(responses, 'Performance', commitLine);
+        }
+        else if (this.startsWithCaseInsensitive(message, 'test')) {
+            this.addItemToResponse(responses, 'Test', commitLine);
+        }
+        else if (this.startsWithCaseInsensitive(message, 'refactor')) {
+            this.addItemToResponse(responses, 'Refactoring', commitLine);
+        }
+        else if (this.startsWithCaseInsensitive(message, 'housekeeping')) {
+            this.addItemToResponse(responses, 'Housekeeping', commitLine);
+        }
+        else if (this.startsWithCaseInsensitive(message, 'fix')) {
+            this.addItemToResponse(responses, 'Fixes', commitLine);
+        }
+        else if (this.startsWithCaseInsensitive(message, 'bug')) {
+            this.addItemToResponse(responses, 'Bug Fixes', commitLine);
+        }
+        else {
+            this.addItemToResponse(responses, 'Other', commitLine);
+        }
     }
     startsWithCaseInsensitive(source, target) {
         const length = target.length;
@@ -5549,24 +5553,32 @@ class CommitHelper {
     getLastReleaseCommitId() {
         return __awaiter(this, void 0, void 0, function* () {
             let startCommitSha;
-            const latestReleaseResponse = yield this._githubClient.repos.getLatestRelease({
-                owner: this._inputSettings.repositoryOwner,
-                repo: this._inputSettings.repositoryOwner
-            });
-            if (latestReleaseResponse.status !== 200 &&
-                latestReleaseResponse.status !== 404) {
-                throw new Error('Did not get a valid response for the latest release.');
-            }
-            else if (latestReleaseResponse.status !== 404 &&
-                !!latestReleaseResponse.data.tag_name) {
-                const refResult = yield this._githubClient.git.getRef({
+            try {
+                const latestReleaseResponse = yield this._githubClient.repos.getLatestRelease({
                     owner: this._inputSettings.repositoryOwner,
-                    repo: this._inputSettings.repositoryName,
-                    ref: `tags/${latestReleaseResponse.data.tag_name}`
+                    repo: this._inputSettings.repositoryOwner
                 });
-                startCommitSha = refResult.data.object.sha;
+                if (latestReleaseResponse.status !== 200 &&
+                    latestReleaseResponse.status !== 404) {
+                    throw new Error('Did not get a valid response for the latest release.');
+                }
+                else if (latestReleaseResponse.status !== 404 &&
+                    !!latestReleaseResponse.data.tag_name) {
+                    const refResult = yield this._githubClient.git.getRef({
+                        owner: this._inputSettings.repositoryOwner,
+                        repo: this._inputSettings.repositoryName,
+                        ref: `tags/${latestReleaseResponse.data.tag_name}`
+                    });
+                    if (refResult.status !== 200) {
+                        throw new Error(`Did not get a valid response about the reference.`);
+                    }
+                    startCommitSha = refResult.data.object.sha;
+                }
+                else {
+                    return yield this.getInitialCommit();
+                }
             }
-            else {
+            catch (e) {
                 return yield this.getInitialCommit();
             }
             return startCommitSha;
@@ -5574,12 +5586,17 @@ class CommitHelper {
     }
     getInitialCommit() {
         return __awaiter(this, void 0, void 0, function* () {
-            const response = yield this._githubClient.paginate(this._githubClient.repos.listCommits, {
-                owner: this._inputSettings.repositoryOwner,
-                repo: this._inputSettings.repositoryOwner,
-                per_page: 100
-            });
-            return response[response.length - 1].sha;
+            try {
+                const response = yield this._githubClient.paginate(this._githubClient.repos.listCommits, {
+                    owner: this._inputSettings.repositoryOwner,
+                    repo: this._inputSettings.repositoryName,
+                    per_page: 100
+                });
+                return response[response.length - 1].sha;
+            }
+            catch (e) {
+                throw new Error(`Could not get a list of commits. ${e.message}`);
+            }
         });
     }
 }

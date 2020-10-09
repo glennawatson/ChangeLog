@@ -68,7 +68,12 @@ export class CommitHelper {
     return response;
   }
 
-  private mapItems(author: string, responses: Map<string, string[]>, commitLine: string, message: any) {
+  private mapItems(
+    author: string,
+    responses: Map<string, string[]>,
+    commitLine: string,
+    message: string
+  ): void {
     if (this.startsWithCaseInsensitive(author, '@dependabot-preview')) {
       this.addItemToResponse(responses, 'Dependencies', commitLine);
     } else if (this.startsWithCaseInsensitive(message, 'feature')) {
@@ -128,30 +133,37 @@ export class CommitHelper {
   private async getLastReleaseCommitId(): Promise<string> {
     let startCommitSha: string;
 
-    const latestReleaseResponse = await this._githubClient.repos.getLatestRelease(
-      {
-        owner: this._inputSettings.repositoryOwner,
-        repo: this._inputSettings.repositoryOwner
+    try {
+      const latestReleaseResponse = await this._githubClient.repos.getLatestRelease(
+        {
+          owner: this._inputSettings.repositoryOwner,
+          repo: this._inputSettings.repositoryOwner
+        }
+      );
+
+      if (
+        latestReleaseResponse.status !== 200 &&
+        latestReleaseResponse.status !== 404
+      ) {
+        throw new Error('Did not get a valid response for the latest release.');
+      } else if (
+        latestReleaseResponse.status !== 404 &&
+        !!latestReleaseResponse.data.tag_name
+      ) {
+        const refResult = await this._githubClient.git.getRef({
+          owner: this._inputSettings.repositoryOwner,
+          repo: this._inputSettings.repositoryName,
+          ref: `tags/${latestReleaseResponse.data.tag_name}`
+        });
+        if (refResult.status !== 200) {
+          throw new Error(`Did not get a valid response about the reference.`);
+        }
+
+        startCommitSha = refResult.data.object.sha;
+      } else {
+        return await this.getInitialCommit();
       }
-    );
-
-    if (
-      latestReleaseResponse.status !== 200 &&
-      latestReleaseResponse.status !== 404
-    ) {
-      throw new Error('Did not get a valid response for the latest release.');
-    } else if (
-      latestReleaseResponse.status !== 404 &&
-      !!latestReleaseResponse.data.tag_name
-    ) {
-      const refResult = await this._githubClient.git.getRef({
-        owner: this._inputSettings.repositoryOwner,
-        repo: this._inputSettings.repositoryName,
-        ref: `tags/${latestReleaseResponse.data.tag_name}`
-      });
-
-      startCommitSha = refResult.data.object.sha;
-    } else {
+    } catch (e) {
       return await this.getInitialCommit();
     }
 
@@ -159,15 +171,18 @@ export class CommitHelper {
   }
 
   private async getInitialCommit(): Promise<string> {
-    const response = await this._githubClient.paginate(
-      this._githubClient.repos.listCommits,
-      {
-        owner: this._inputSettings.repositoryOwner,
-        repo: this._inputSettings.repositoryOwner,
-        per_page: 100
-      }
-    );
-
-    return response[response.length - 1].sha;
+    try {
+      const response = await this._githubClient.paginate(
+        this._githubClient.repos.listCommits,
+        {
+          owner: this._inputSettings.repositoryOwner,
+          repo: this._inputSettings.repositoryName,
+          per_page: 100
+        }
+      );
+      return response[response.length - 1].sha;
+    } catch (e) {
+      throw new Error(`Could not get a list of commits. ${e.message}`);
+    }
   }
 }

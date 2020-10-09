@@ -21,6 +21,10 @@
   <component name="ChangeListManager">
     <list default="true" id="465829d9-e952-4647-8e14-e39282cf1038" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/dist/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/index.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/dist/index.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commit-helper.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/commit-helper.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -88,7 +92,8 @@
       <option name="presentableId" value="Default" />
       <updated>1602160978097</updated>
       <workItem from="1602160979780" duration="4802000" />
-      <workItem from="1602225201939" duration="6091000" />
+      <workItem from="1602225201939" duration="6547000" />
+      <workItem from="1602236139294" duration="2014000" />
     </task>
     <servers />
   </component>
@@ -198,8 +203,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/src/commit-helper.ts</url>
-          <line>91</line>
-          <properties lambdaOrdinal="-1" />
+          <line>67</line>
           <option name="timeStamp" value="8" />
         </line-breakpoint>
       </breakpoints>
