@@ -17,7 +17,7 @@ export class CommitHelper {
     const startCommit = await this.getLastReleaseCommitId();
 
     core.debug(`The start commit is ${startCommit} and end commit is ${endCommit}`);
-    
+
     const commitsResponse = await this._githubClient.repos.compareCommits({
       owner: this._inputSettings.repositoryOwner,
       repo: this._inputSettings.repositoryName,
@@ -140,7 +140,7 @@ export class CommitHelper {
       const latestReleaseResponse = await this._githubClient.repos.getLatestRelease(
         {
           owner: this._inputSettings.repositoryOwner,
-          repo: this._inputSettings.repositoryOwner
+          repo: this._inputSettings.repositoryName
         }
       );
 

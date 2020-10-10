@@ -18,6 +18,9 @@ inputs:
       triggered a workflow, this defaults to the reference or SHA for that
       event.  Otherwise, uses the default branch.
     required: false
+  repository:
+    description: 'Repository name with owner. For example, glennawatson/ChangeLog'
+    default: ${{ github.repository }}
 outputs:
   changelog:
     description: 'Generated changelog'

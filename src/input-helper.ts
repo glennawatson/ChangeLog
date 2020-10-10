@@ -8,15 +8,6 @@ export function getInputs(): IGitSourceSettings {
 
   result.authToken = core.getInput('token');
 
-  // GitHub workspace
-  let githubWorkspacePath = process.env['GITHUB_WORKSPACE'];
-  if (!githubWorkspacePath) {
-    throw new Error('GITHUB_WORKSPACE not defined');
-  }
-
-  githubWorkspacePath = path.resolve(githubWorkspacePath);
-  core.debug(`GITHUB_WORKSPACE = '${githubWorkspacePath}'`);
-
   const qualifiedRepository =
     core.getInput('repository') ||
     `${github.context.repo.owner}/${github.context.repo.repo}`;
