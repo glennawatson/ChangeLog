@@ -4721,16 +4721,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getInputs = void 0;
 const core = __importStar(__webpack_require__(186));
 const github = __importStar(__webpack_require__(438));
-const path = __importStar(__webpack_require__(622));
 function getInputs() {
     const result = {};
     result.authToken = core.getInput('token');
-    let githubWorkspacePath = process.env['GITHUB_WORKSPACE'];
-    if (!githubWorkspacePath) {
-        throw new Error('GITHUB_WORKSPACE not defined');
-    }
-    githubWorkspacePath = path.resolve(githubWorkspacePath);
-    core.debug(`GITHUB_WORKSPACE = '${githubWorkspacePath}'`);
     const qualifiedRepository = core.getInput('repository') ||
         `${github.context.repo.owner}/${github.context.repo.repo}`;
     const isWorkflowRepository = qualifiedRepository.toUpperCase() ===
@@ -5447,6 +5440,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CommitHelper = void 0;
+const core = __importStar(__webpack_require__(186));
 const github = __importStar(__webpack_require__(438));
 class CommitHelper {
     constructor(inputSettings) {
@@ -5457,6 +5451,7 @@ class CommitHelper {
         return __awaiter(this, void 0, void 0, function* () {
             const endCommit = this._inputSettings.commit;
             const startCommit = yield this.getLastReleaseCommitId();
+            core.debug(`The start commit is ${startCommit} and end commit is ${endCommit}`);
             const commitsResponse = yield this._githubClient.repos.compareCommits({
                 owner: this._inputSettings.repositoryOwner,
                 repo: this._inputSettings.repositoryName,
@@ -5556,7 +5551,7 @@ class CommitHelper {
             try {
                 const latestReleaseResponse = yield this._githubClient.repos.getLatestRelease({
                     owner: this._inputSettings.repositoryOwner,
-                    repo: this._inputSettings.repositoryOwner
+                    repo: this._inputSettings.repositoryName
                 });
                 if (latestReleaseResponse.status !== 200 &&
                     latestReleaseResponse.status !== 404) {
