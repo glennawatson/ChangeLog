@@ -73,15 +73,13 @@ All inputs are optional.
 | changelog | The generated change log |
 
 
-A example of the output is below:
+A example of the `changelog`:
 
-```
-Dependencies:
+## Dependencies:
 82d6883 build(deps): bump NLog from 4.7.4 to 4.7.5 (#592) @dependabot-preview[bot]
-Fixes:
-a2cadff Fixes for UWP Platform Bitmap Loader (#600) @dpvreony
-Housekeeping:
-13775c5 housekeeping: Move Splat to GitHub actions @glennawatson
-Other:
-92b41f9 #586 bitmap loader init perf fixes (#598) @dpvreony
-```
+## Fixes:
+* a2cadff Fixes for UWP Platform Bitmap Loader (#600) @dpvreony
+## Housekeeping:
+* 13775c5 housekeeping: Move Splat to GitHub actions @glennawatson
+## Other:
+* 92b41f9 #586 bitmap loader init perf fixes (#598) @dpvreony
