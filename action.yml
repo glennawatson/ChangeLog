@@ -1,5 +1,5 @@
-name: 'change-log-generator'
-description: 'GitHub Action for generating a change log. Based on Azure DevOps task. Can handle all targets including windows, mac and ubuntu.'
+name: 'make-change-log'
+description: 'GitHub Action for generating a change log. Can handle all targets including windows, mac and ubuntu.'
 author: 'Glenn Watson'
 inputs:
   token:
