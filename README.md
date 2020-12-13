@@ -46,6 +46,8 @@ One is a special case for Dependabot, if the author of the commit is `@dependabo
 
 | Prefix | Release Note Header |
 | --- | --- |
+| dep | Dependencies |
+| dependency | Dependencies |
 | feature | Features |
 | feat | Features |
 | docs | Documentation |
