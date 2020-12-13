@@ -81,6 +81,10 @@ export class CommitHelper {
   ): void {
     if (this.startsWithCaseInsensitive(author, '@dependabot-preview')) {
       this.addItemToResponse(responses, 'Dependencies', commitLine);
+    } else if (this.startsWithCaseInsensitive(message, 'dep')) {
+      this.addItemToResponse(responses, 'Dependencies', commitLine);
+    } else if (this.startsWithCaseInsensitive(message, 'dependency')) {
+      this.addItemToResponse(responses, 'Dependencies', commitLine);
     } else if (this.startsWithCaseInsensitive(message, 'feature')) {
       this.addItemToResponse(responses, 'Features', commitLine);
     } else if (this.startsWithCaseInsensitive(message, 'feat')) {
