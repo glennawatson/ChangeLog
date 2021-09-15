@@ -15,8 +15,12 @@ async function run(): Promise<void> {
     const commitLog = await commitHelper.getCommitList();
 
     core.setOutput('commitLog', commitLog.join('\n'));
-  } catch (error) {
-    core.setFailed(`There is a weird error ${error.message} ${error.stack}`);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      core.setFailed(`There is a weird error ${error.message} ${error.stack}`);
+    }
+
+    core.setFailed(`Weird instance issue`);
   }
 }
 

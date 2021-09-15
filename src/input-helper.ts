@@ -3,7 +3,7 @@ import * as github from '@actions/github';
 import {IGitSourceSettings} from './git-source-settings';
 
 export function getInputs(): IGitSourceSettings {
-  const result = ({} as unknown) as IGitSourceSettings;
+  const result = {} as unknown as IGitSourceSettings;
 
   result.authToken = core.getInput('token');
 

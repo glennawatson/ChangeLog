@@ -20,7 +20,7 @@ export class CommitHelper {
       `The start commit is ${startCommit} and end commit is ${endCommit}`
     );
 
-    const commitsResponse = await this._githubClient.repos.compareCommits({
+    const commitsResponse = await this._githubClient.rest.repos.compareCommits({
       owner: this._inputSettings.repositoryOwner,
       repo: this._inputSettings.repositoryName,
       base: startCommit,
@@ -45,7 +45,7 @@ export class CommitHelper {
       let author = commit.author ? `@${commit.author.login}` : null;
       if (author == null) {
         // use the name from the commit itself if we cannot find a GitHub committer
-        author = commit.commit.author.name;
+        author = commit?.commit?.author?.name ?? 'Unknown';
       }
 
       const commitLine = ` * ${commit.sha} ${message} ${author}`;
@@ -141,23 +141,19 @@ export class CommitHelper {
     let startCommitSha: string;
 
     try {
-      const latestReleaseResponse = await this._githubClient.repos.getLatestRelease(
-        {
+      const latestReleaseResponse =
+        await this._githubClient.rest.repos.getLatestRelease({
           owner: this._inputSettings.repositoryOwner,
           repo: this._inputSettings.repositoryName
-        }
-      );
+        });
 
       if (
         latestReleaseResponse.status !== 200 &&
         latestReleaseResponse.status !== 404
       ) {
         throw new Error('Did not get a valid response for the latest release.');
-      } else if (
-        latestReleaseResponse.status !== 404 &&
-        !!latestReleaseResponse.data.tag_name
-      ) {
-        const refResult = await this._githubClient.git.getRef({
+      } else if (latestReleaseResponse.data.tag_name) {
+        const refResult = await this._githubClient.rest.git.getRef({
           owner: this._inputSettings.repositoryOwner,
           repo: this._inputSettings.repositoryName,
           ref: `tags/${latestReleaseResponse.data.tag_name}`
@@ -180,7 +176,7 @@ export class CommitHelper {
   private async getInitialCommit(): Promise<string> {
     try {
       const response = await this._githubClient.paginate(
-        this._githubClient.repos.listCommits,
+        this._githubClient.rest.repos.listCommits,
         {
           owner: this._inputSettings.repositoryOwner,
           repo: this._inputSettings.repositoryName,
@@ -188,8 +184,12 @@ export class CommitHelper {
         }
       );
       return response[response.length - 1].sha;
-    } catch (e) {
-      throw new Error(`Could not get a list of commits. ${e.message}`);
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        throw new Error(`Could not get a list of commits. ${e.message}`);
+      } else {
+        throw new Error('Could no get a list of commits.');
+      }
     }
   }
 }
