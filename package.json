@@ -27,7 +27,7 @@
   "dependencies": {
     "@actions/core": "^1.5.0",
     "@actions/github": "^5.0.0",
-    "@octokit/webhooks": "^9.14.2"
+    "@octokit/webhooks": "^9.15.0"
   },
   "devDependencies": {
     "@types/jest": "^27.0.1",
